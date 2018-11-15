@@ -53,11 +53,10 @@ class vcloud:
         xml_content = resp.text 
         root = ElementTree.fromstring(xml_content)
         for child in root:
-            if child.tag == '{http://www.vmware.com/vcloud/v1.5}Children':
+            if 'Children' in child.tag:
                 return [ subchild.attrib['href'] for subchild in child ]
 
     def getMAC(self, vm):
-        mac = ''
         resp = requests.get(url=vm,headers=self.headers)
         xml_content = resp.text 
         root = ElementTree.fromstring(xml_content)
@@ -66,11 +65,8 @@ class vcloud:
         resp = requests.get(url=vm+'/networkConnectionSection',headers=self.headers)
         xml_content = resp.text 
         root = ElementTree.fromstring(xml_content)
-        # print(root[2][2].tag)
-        # print(root[2][2].text)
-        macs = root[2].findall('{http://www.vmware.com/vcloud/v1.5}MACAddress')
-        if len(macs) > 0:
-            mac = macs[0].text
-        return (name,mac)
+        for item in root[2]:
+            if 'MACAddress' in item.tag:
+                return (name,item.text)
            
         
